@@ -22,7 +22,8 @@ const handleApiError = (error) => {
 
 export const fetchCurrentUser = async () => {
     try {
-        const response = await api.get('/user');
+        const response = await api.get('/api/user');
+        console.log(response.data);
         return response.ok ? response.data : null
     } catch (error) {
         console.log(error);

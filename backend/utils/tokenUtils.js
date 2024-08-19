@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv'
-import { JWT_SECRET, REFRESH_TOKEN_SECRET } from './constants';
+import { JWT_SECRET, REFRESH_TOKEN_SECRET } from './constants.js';
 dotenv.config()
 
 export function generateAccessToken(payload) {

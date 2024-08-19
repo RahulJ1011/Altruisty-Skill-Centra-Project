@@ -11,8 +11,9 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (!isLoggedIn) {
-      const data = fetchCurrentUser();
-      data && setUser(data) && setIsLoggedIn(true);
+     const data = fetchCurrentUser();
+      console.log(data);
+      data && setUser(data) && setIsLoggedIn(true); 
     }
   }, [isLoggedIn]);
 

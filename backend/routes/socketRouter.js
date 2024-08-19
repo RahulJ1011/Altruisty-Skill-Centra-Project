@@ -1,37 +1,40 @@
-import { userSocketMap } from "../../index.js";
+import { userSocketMap } from "../index.js";
 import Community from "../models/community.model.js";
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 
 const socketRouter = (io) => {
     io.on('connection', (socket) => {
+        console.log(`A user connected: ${socket.id}`);
+    
         socket.on('userConnected', (userId) => {
+            console.log(`User ${userId} connected with socket ID ${socket.id}`);
             userSocketMap.set(userId, socket.id);
-            console.log(`User ${userId} connected`);
         });
-        
+    
         socket.on('joinCommunity', async ({ communityCode }) => {
+            console.log(`User ${socket.id} trying to join community ${communityCode}`);
             try {
                 const community = await Community.findOne({ uniqueCode: communityCode });
                 if (!community) {
                     socket.emit('error', { message: 'Community not found' });
+                    console.log(`Community ${communityCode} not found`);
                     return;
                 }
-        
                 const user = await User.findById(socket.user._id);
                 if (!user) {
                     socket.emit('error', { message: 'User not found' });
+                    console.log(`User ${socket.user._id} not found`);
                     return;
                 }
-                
                 if (!community.members.includes(user._id)) {
                     community.members.push(user._id);
                     await community.save();
-                }else{
+                } else {
                     socket.emit('error', { message: 'Already a member of this community' });
+                    console.log(`User ${socket.user._id} is already a member of community ${communityCode}`);
                     return;
                 }
-        
                 socket.join(communityCode);
                 socket.emit('joinedCommunity', { communityCode });
                 console.log(`User ${socket.user._id} joined community ${communityCode}`);
@@ -40,7 +43,6 @@ const socketRouter = (io) => {
                 socket.emit('error', { message: 'Internal server error' });
             }
         });
-    
         // Post a message to a community
         socket.on('postMessageToCommunity', async ({ communityCode, messageText }) => {
             try {
@@ -108,7 +110,7 @@ const socketRouter = (io) => {
         });
     
         socket.on('disconnect', () => {
-            console.log('User disconnected');
+            console.log(`User disconnected: ${socket.id}`);
         });
     });
 }

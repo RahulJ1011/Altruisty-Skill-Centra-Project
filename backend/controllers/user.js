@@ -1,8 +1,6 @@
 import crypto from 'crypto';
 import Community from '../models/community.model.js';
 
-
-
 // ==========> User route <===========
 export const checkUserRoute = async (req, res) => {
   if (req.user.user_type !== 2) {

@@ -1,9 +1,43 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
+import { io } from 'socket.io-client';
 import SideBarCommunity from "./SideBarCommunity";
 import { IoSearchOutline } from "react-icons/io5";
-import collab from "../../assets/colloborate.webp"
-import {Link } from "react-router-dom"
+import collab from "../../assets/colloborate.webp";
+import { Link, useNavigate } from "react-router-dom";
+
 function Collab() {
+  const [communitycode, setCommunitycode] = useState("");
+  const [socket, setSocket] = useState(null);
+  const [popup, setPopup] = useState('');
+  const navigate = useNavigate();
+  useEffect(() => {
+    const websocket = io("http://localhost:5000");
+
+    setSocket(websocket);
+
+    websocket.emit('userConnected', 'exampleUserId'); 
+
+    websocket.on("joinedCommunity", ({ communityCode }) => {
+        setPopup(`Successfully joined the community ${communityCode}`);
+        navigate('/SkillCentra/community/colloboration/teams')
+    });
+
+    websocket.on('error', ({ message }) => {
+        setPopup(message);
+        console.log(message);
+        alert(message)
+    });
+
+    return () => {
+        websocket.disconnect(); 
+    };
+}, []);
+const handleJoinCommunity = () => {
+    if (socket) {
+        socket.emit('joinCommunity', { communityCode: communitycode });
+    }
+};
+
   return (
     <div className="bg-[#f7d883]  font-times max-sm:w-[100%] max-sm:h-full h-full w-full xl:pb[600px]">
       <SideBarCommunity />
@@ -40,7 +74,7 @@ function Collab() {
             <div className="w-1/2 md:pt-[50px] md:pl-[30px]  max-sm:w-[100%]">
               <h1 className="font-bold text-4xl max-sm:text-lg text-Yellow">Collaborate with your team to learn</h1>
               <p className="text-Darkblue mt-[10px] text-2xl max-sm:text-lg font-semibold max-sm:font-normal">Join,Collaborate and Achieve Together</p>
-              {/* Create a team */}
+              
               <div className=' max-sm:w-[80%] md:hidden'>
                  <img src={collab} />
                 </div>
@@ -51,19 +85,24 @@ function Collab() {
                 <input
                   type="text"
                   placeholder="Enter a team code to join"
+                  value={communitycode}
+                  onChange={(e) => setCommunitycode(e.target.value)}
+
                   className='p-2 placeholder-gray-400 ring-2 ring-Yellow w-[35%] 
                   focus:outline-none text-Darkblue focus:ring-2 focus:ring-Yellow 
                   h-[35px] rounded-md max-sm:w-[100%]' />
 
-                 <Link to="/SkillCentra/community/colloboration/teams">
-                  <button className='ring-2 ring-Yellow bg-Yellow text-Darkblue  font-normal 
+                 
+                  <button 
+                  onClick={handleJoinCommunity}
+                  className='ring-2 ring-Yellow bg-Yellow text-Darkblue  font-normal 
                   text-lg rounded-sm cursor-pointer px-4  max-sm:mt-[20px] max-sm:w-full'>Join</button>
-                  </Link>
+                  
 
 
               </div>
             </div>
-            {/* side image */}
+            
             <div className='w-1/2 max-sm:w-[20%] max-sm:hidden'>
               <img src={collab} />
             </div>

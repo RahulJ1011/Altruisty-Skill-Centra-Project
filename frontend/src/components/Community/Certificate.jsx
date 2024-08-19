@@ -8,7 +8,7 @@ import { FaUpload } from "react-icons/fa6";
 function Certificate({ certificate, closeCertificate }) {
   const [message,setMessage]=useState("");
   const[messageSent,setMessageSent]=useState(false);
-
+  
 
 
   return (

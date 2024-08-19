@@ -100,7 +100,7 @@ export const credentialLogin = async (req, res) => {
 export const credentialSignup = async (req, res) => {
   try {
     const { username, password } = req.body;
-
+   
 
     // Check if the user already exists
     const existingUser = await User.findOne({ username });
@@ -114,8 +114,10 @@ export const credentialSignup = async (req, res) => {
     // Create a new user
     const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
-
-    res.status(201).json({ msg: 'User registered successfully' });
+    const userWithoutPassword = newUser.toObject();
+    delete userWithoutPassword.password;
+    
+    res.status(201).json({ msg: 'User registered successfully' ,user:newUser});
   } catch (error) {
     console.log(error);
     res.status(500).json({ msg: 'Server Error' });
